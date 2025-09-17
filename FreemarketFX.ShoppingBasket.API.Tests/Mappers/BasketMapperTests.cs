@@ -87,4 +87,119 @@ public class BasketMapperTests
         Assert.Equal(0, productDto.Price);
         Assert.False(productDto.IsDiscounted);
     }
+
+    [Theory]
+    [InlineData(20, 30, 50)]
+    [InlineData(19.99, 20.99, 40.98)]
+    public void MapToDto_ShouldGenerateTheCorrectSubtotalExcludingVat(
+        decimal firstPrice,
+        decimal secondPrice,
+        decimal expectedSubTotal)
+    {
+        // Arrange
+        BasketDto? actualDto;
+
+        var basket = new Basket
+        {
+            Id = Guid.NewGuid(),
+            Country = null!,
+            DiscountCode = null,
+            BasketProducts =
+            [
+                new() {
+                    ProductId = Guid.NewGuid(),
+                    Quantity = 1,
+                    Product = new (){ Id = Guid.NewGuid(), Name = "Table", Price = firstPrice }
+                },
+                new() {
+                    ProductId = Guid.NewGuid(),
+                    Quantity = 1,
+                    Product = new (){ Id = Guid.NewGuid(), Name = "Table 2", Price = secondPrice }
+                }
+            ]
+        };
+
+        // Act
+        actualDto = basket.MapToDto();
+
+        // Assert
+        Assert.Equal(expectedSubTotal, actualDto.SubtotalExcludingVat);
+    }
+
+    [Theory]
+    [InlineData(20, 30, 60)]
+    [InlineData(19.99, 20.99, 49.18)]
+    public void MapToDto_ShouldGenerateTheCorrectSubtotalIncludingVat(
+        decimal firstPrice,
+        decimal secondPrice,
+        decimal expectedSubTotal)
+    {
+        // Arrange
+        BasketDto? actualDto;
+
+        var basket = new Basket
+        {
+            Id = Guid.NewGuid(),
+            Country = null!,
+            DiscountCode = null,
+            BasketProducts =
+            [
+                new() {
+                    ProductId = Guid.NewGuid(),
+                    Quantity = 1,
+                    Product = new (){ Id = Guid.NewGuid(), Name = "Table", Price = firstPrice }
+                },
+                new() {
+                    ProductId = Guid.NewGuid(),
+                    Quantity = 1,
+                    Product = new (){ Id = Guid.NewGuid(), Name = "Table 2", Price = secondPrice }
+                }
+            ]
+        };
+
+        // Act
+        actualDto = basket.MapToDto();
+
+        // Assert
+        Assert.Equal(expectedSubTotal, actualDto.SubtotalIncludingVat);
+    }
+
+    [Theory]
+    [InlineData(20, 30, "UK", 65)]
+    [InlineData(19.99, 20.99, "US", 79.18)]
+    public void MapToDto_ShouldGenerateTheCorrectTotal(
+        decimal firstPrice,
+        decimal secondPrice,
+        string country,
+        decimal expectedSubTotal)
+    {
+        // Arrange
+        BasketDto? actualDto;
+
+        var basket = new Basket
+        {
+            Id = Guid.NewGuid(),
+            Country = country,
+            DiscountCode = null,
+            BasketProducts =
+            [
+                new() {
+                    ProductId = Guid.NewGuid(),
+                    Quantity = 1,
+                    Product = new (){ Id = Guid.NewGuid(), Name = "Table", Price = firstPrice }
+                },
+                new() {
+                    ProductId = Guid.NewGuid(),
+                    Quantity = 1,
+                    Product = new (){ Id = Guid.NewGuid(), Name = "Table 2", Price = secondPrice }
+                }
+            ]
+        };
+
+        // Act
+        actualDto = basket.MapToDto();
+
+        // Assert
+        Assert.Equal(expectedSubTotal, actualDto.Total);
+    }
 }
