@@ -1,6 +1,6 @@
-﻿using FreemarketFX.ShoppingBasket.API.DataTransferObjects;
+﻿using FreemarketFX.ShoppingBasket.API.Controllers;
+using FreemarketFX.ShoppingBasket.API.DataTransferObjects;
 using FreemarketFX.ShoppingBasket.API.Services.Interfaces;
-using FreemarketFX.ShoppingBasket.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -76,7 +76,7 @@ public class BasketsControllerTests
     }
 
     [Fact]
-    public async Task GetBasketById_ShouldReturnNull_ForInvalidId()
+    public async Task GetBasketById_ShouldReturnNotFound_ForInvalidId()
     {
         // Arrange
         BasketsController controller = new(_service, _logger);

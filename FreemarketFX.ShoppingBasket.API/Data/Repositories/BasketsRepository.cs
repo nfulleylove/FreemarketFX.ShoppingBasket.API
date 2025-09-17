@@ -30,9 +30,34 @@ public class BasketsRepository(ShoppingDbContext context) : IBasketsRepository
         return basket;
     }
 
-    public Task<Basket> AddProductToBasketAsync(Guid basketId, Guid productId)
+    public async Task<Basket> AddProductToBasketAsync(Guid basketId, Guid productId)
     {
-        throw new NotImplementedException();
+        Basket basket = await GetBasketByIdAsync(basketId)
+            ?? throw new KeyNotFoundException($"Basket not found in database with ID: {productId}");
+
+        Product product = await _context.Products
+            .SingleOrDefaultAsync(
+            x =>
+            x.Id == productId)
+            ?? throw new KeyNotFoundException($"Product not found in database with ID: {productId}");
+
+        // Check basket for existing product
+        BasketProduct? basketProduct = basket.BasketProducts
+            .SingleOrDefault(
+            x =>
+            x.BasketId == basketId &&
+            x.ProductId == productId);
+
+        // Add product or increment quantity
+        if (basketProduct != null)
+            basketProduct.Quantity += 1;
+        else
+            basket.BasketProducts.Add(new BasketProduct { BasketId = basketId, ProductId = productId });
+
+
+        await _context.SaveChangesAsync();
+
+        return basket;
     }
 
     public Task<Basket> AddProductsToBasketAsync(Guid basketId, IEnumerable<Guid> productIds)

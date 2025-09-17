@@ -24,9 +24,11 @@ public class BasketService(IBasketsRepository repository) : IBasketService
         return basket?.MapToDto();
     }
 
-    public Task<BasketDto> AddProductToBasketAsync(Guid basketId, Guid productId)
+    public async Task<BasketDto> AddProductToBasketAsync(Guid basketId, Guid productId)
     {
-        throw new NotImplementedException();
+        Basket basket = await _repository.AddProductToBasketAsync(basketId, productId);
+
+        return basket.MapToDto();
     }
 
     public Task<BasketDto> AddProductsToBasketAsync(Guid basketId, IEnumerable<Guid> productIds)

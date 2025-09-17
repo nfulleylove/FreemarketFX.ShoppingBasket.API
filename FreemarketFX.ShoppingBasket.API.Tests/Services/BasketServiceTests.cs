@@ -22,7 +22,6 @@ public class BasketServiceTests
             Task.FromResult<Basket>(
             new() { Id = Guid.NewGuid() }));
 
-
         // Get Basket with a valid ID
         _repository.GetBasketByIdAsync(_validId).Returns(
         Task.FromResult<Basket?>(new Basket
@@ -40,7 +39,8 @@ public class BasketServiceTests
                 {
                     Id = _validProductId,
                     Name = "Table",
-                    Price = 399.99M
+                    Price = 399.99M,
+                    IsDiscounted = true
                 },
                 Quantity = 1
             }
@@ -67,9 +67,10 @@ public class BasketServiceTests
                     {
                         Id = _addProductId,
                         Name = "Chair",
-                        Price = 44.99M
+                        Price = 44.99M,
+                        IsDiscounted = true
                     },
-                Quantity = 1
+                Quantity = 4
             }
         ]
             }));
@@ -104,6 +105,8 @@ public class BasketServiceTests
         decimal expectedProductPrice = 399.99M;
         string expectedCountry = "US";
         string expectedDiscountCode = "10OFF";
+        bool expectedIsDiscounted = true;
+        int expectedQuantity = 1;
 
         // Act
         actualBasket = await service.GetBasketByIdAsync(expectedId);
@@ -118,6 +121,8 @@ public class BasketServiceTests
         Assert.Equal(expectedProductId, actualBasket.Products.First().Id);
         Assert.Equal(expectedProductName, actualBasket.Products.First().Name);
         Assert.Equal(expectedProductPrice, actualBasket.Products.First().Price);
+        Assert.Equal(expectedIsDiscounted, actualBasket.Products.First().IsDiscounted);
+        Assert.Equal(expectedQuantity, actualBasket.Products.First().Quantity);
     }
 
     [Fact]
@@ -133,5 +138,34 @@ public class BasketServiceTests
 
         // Assert
         Assert.Null(actualBasket);
+    }
+
+    [Fact]
+    public async Task AddProductToBasketAsync_ShouldReturnBasketWithProduct_ForValidIds()
+    {
+        // Arrange
+        BasketService service = new(_repository);
+        BasketDto? actualBasket;
+        Guid expectedId = _validId;
+        Guid expectedProductId = _addProductId;
+        int expectedProductsCount = 1;
+        string expectedProductName = "Chair";
+        decimal expectedProductPrice = 44.99M;
+        bool expectedIsDiscounted = true;
+        int expectedQuantity = 4;
+
+        // Act
+        actualBasket = await service.AddProductToBasketAsync(expectedId, expectedProductId);
+
+        // Assert
+        Assert.NotNull(actualBasket);
+        Assert.Equal(expectedId, actualBasket.Id);
+        Assert.NotEmpty(actualBasket.Products);
+        Assert.Equal(expectedProductsCount, actualBasket.Products.Count);
+        Assert.Equal(expectedProductId, actualBasket.Products.First().Id);
+        Assert.Equal(expectedProductName, actualBasket.Products.First().Name);
+        Assert.Equal(expectedProductPrice, actualBasket.Products.First().Price);
+        Assert.Equal(expectedIsDiscounted, actualBasket.Products.First().IsDiscounted);
+        Assert.Equal(expectedQuantity, actualBasket.Products.First().Quantity);
     }
 }

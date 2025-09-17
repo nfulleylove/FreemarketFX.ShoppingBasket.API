@@ -3,7 +3,7 @@ using FreemarketFX.ShoppingBasket.API.Models;
 using FreemarketFX.ShoppingBasket.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FreemarketFX.ShoppingBasket.Controllers;
+namespace FreemarketFX.ShoppingBasket.API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
@@ -14,6 +14,9 @@ public class BasketsController(
     private readonly IBasketService _basketService = basketService;
     private readonly ILogger<BasketsController> _logger = logger;
 
+    /// <summary>
+    /// Creates a new basket.
+    /// </summary>
     [HttpPost(Name = "AddBasket")]
     [ProducesResponseType<Basket>(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -33,6 +36,10 @@ public class BasketsController(
         }
     }
 
+    /// <summary>
+    /// Gets a basket by its ID.
+    /// </summary>
+    /// <param name="id" example="A1D8D4B0-551D-4A26-A417-5EE3FFE3A4E2">The ID of the basket.</param>
     [HttpGet("{id}", Name = "GetBasketById")]
     [ProducesResponseType<BasketDto>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
